@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Cập nhật giảng viên</title>
+
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 800px;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+
+        th {
+            text-align: center;
+            background-color: #eee;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 8px 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>ĐƠN VỊ GIẢNG VIÊN ĐÃ CẬP NHẬT</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Họ tên giảng viên</th>
+            <th>Ngành</th>
+            <th>Đơn vị</th>
+        </tr>
+    </thead>
+
+    <tbody id="dsGiangVien">
+    </tbody>
+</table>
+
+<script>
+
+let xml;
+let xmlString;
+
+// Đọc file XML
+fetch("hosogiangvien.xml")
+    .then(response => response.text())
+    .then(data => {
+
+        let parser = new DOMParser();
+
+        xml = parser.parseFromString(data, "text/xml");
+
+        capNhat();
+    })
+    .catch(error => {
+        console.log("Lỗi:", error);
+    });
+
+
+// Hiển thị danh sách giảng viên
+function hienThi() {
+
+    let giangviens = xml.getElementsByTagName("giangvien");
+
+    let tbody = document.getElementById("dsGiangVien");
+
+    tbody.innerHTML = "";
+
+    for (let i = 0; i < giangviens.length; i++) {
+
+        let hoten = giangviens[i]
+            .getElementsByTagName("hoten")[0]
+            .textContent;
+
+        let nganh = giangviens[i]
+            .getElementsByTagName("nganh")[0]
+            .textContent;
+
+        let donvi = giangviens[i]
+            .getElementsByTagName("donvi")[0]
+            .textContent;
+
+        let row = `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${hoten}</td>
+                <td>${nganh}</td>
+                <td>${donvi}</td>
+            </tr>
+        `;
+
+        tbody.innerHTML += row;
+    }
+}
+
+
+// Cập nhật đơn vị
+function capNhat() {
+
+    let giangviens = xml.getElementsByTagName("giangvien");
+
+    for (let i = 0; i < giangviens.length; i++) {
+
+        let hoten = giangviens[i]
+            .getElementsByTagName("hoten")[0]
+            .textContent
+            .trim();
+
+        if (hoten === "Phạm Thanh Loan") {
+
+            giangviens[i]
+                .getElementsByTagName("donvi")[0]
+                .textContent = "Cơ bản";
+
+
+            hienThi();
+
+            return;
+        }
+    }
+
+    alert("Không tìm thấy giảng viên Phạm Thanh Loan!");
+}
+
+
+</script>
+
+</body>
+</html>
